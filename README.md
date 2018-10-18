@@ -5,7 +5,7 @@ NA values: the **sentinel** method, and the **bitmask** method.
 
 ## The sentinel method
 
-With this method, one particular value among the type's domain is denounced 
+With this method, one particular value among the type's domain is denounced
 to be "the NA" value. For example, for `int32` it's the smallest negative
 value: `-2147483648`; for `int64` it's similarly `-9223372036854775808`.
 For `double`s and `float`s the IEEE-754 standard offers a whole range of
@@ -23,10 +23,10 @@ The benefits of this method are:
   doesn't have to be allocated at all.
 - Determining whether a particular value is NA or not is a simple comparison,
   as opposed to complex bit arithmetics used in bitmask method.
-- Certain operations may be faster with this method: 
-  - appending two vectors can be done as-is, without the need to shift the 
-    bits in the second vector; 
-  - arithmetics on floating point values are simpler, since the NA values 
+- Certain operations may be faster with this method:
+  - appending two vectors can be done as-is, without the need to shift the
+    bits in the second vector;
+  - arithmetics on floating point values are simpler, since the NA values
     are handled by the CPU.
 
 ## The bitmask method
@@ -43,21 +43,24 @@ The benefits of this method are:
 - NA handling is uniform across integer and real types.
 - For certain types picking a good sentinel is an impossible task. For
   example, `byte`: all values in the range 0 .. 255 are useful.
-- Certain operations may be faster with this method: 
-  - adding two vectors `x + y`, the values can be added as-is, and then the 
-    bitmasks simply OR-ed together (64 values at a time!);
+- Certain operations may be faster with this method:
+  - adding two vectors `x + y`, the values can be added as-is, and then the
+    bitmasks simply AND-ed together (64 values at a time!);
   - type casts are simpler: the NA bitmask doesn't change at all, and all
     other values can be converted as-is.
 
 
 # Benchmark
 
-We first attempt to replicate the results 
+We first attempt to replicate the results
 [published by Wes McKinney](http://wesmckinney.com/blog/bitmaps-vs-sentinel-values/)
 in his blog. The methodology is similar:
   - First, create a vector of `n` random integers in the range -10 .. 10;
   - Randomly replace a proportion `p` of them with NAs;
-  - Main task: find the sum of all non-NA values in this vector.
+  - Main task: find the sum of all non-NA values in this vector;
+  - Run the main task 100 times and report the average time;
+  - Use different methods to run the main task, and compare timings across
+    all methods.
 
 
 # Conclusions
