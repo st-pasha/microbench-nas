@@ -33,11 +33,14 @@ The benefits of this method are:
 
 This method allocates an extra bitmask array of size `n / 8` bytes, where
 each bit indicates whether the corresponding value in the main array is NA
-or not. If the bit is set, then the actual stored value is irrelevant.
+or not. If the bit is 1, then the value is "valid". If the bit is 0, then
+the value is considered NA, and the actual quantity stored in the main
+array can be anything.
 
 The benefits of this method are:
 - It is universal: NA handling for all types is exactly the same. If a new
   type is added there is no need to pick any sentinel value.
+- NA handling is uniform across integer and real types.
 - For certain types picking a good sentinel is an impossible task. For
   example, `byte`: all values in the range 0 .. 255 are useful.
 - Certain operations may be faster with this method: 
